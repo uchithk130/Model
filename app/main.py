@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import numpy as np
 import pandas as pd
@@ -6,7 +7,13 @@ from sklearn.metrics.pairwise import cosine_similarity
 from mangum import Mangum
 app = FastAPI()
 
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins, or replace "*" with specific origins like ['https://yourfrontend.com']
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods, or restrict to specific methods like ['GET', 'POST']
+    allow_headers=["*"],  # Allow all headers
+)
 # Load data
 df2 = pd.read_csv("app/final.csv")
 makeup = pd.read_csv("app/makeup_final.csv")

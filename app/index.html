@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Recommendations</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="container mx-auto">
+
+        <!-- Form for selecting features and skin attributes -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">Select Features</h2>
+            <div class="grid grid-cols-3 gap-4">
+                <!-- Features Checkboxes -->
+                <label class="block">
+                    <input type="checkbox" class="feature" value="normal"> Normal
+                </label>
+                <label class="block">
+                    <input type="checkbox" class="feature" value="dry"> Dry
+                </label>
+                <label class="block">
+                    <input type="checkbox" class="feature" value="oily"> Oily
+                </label>
+                <label class="block">
+                    <input type="checkbox" class="feature" value="combination"> Combination
+                </label>
+                <label class="block">
+                    <input type="checkbox" class="feature" value="acne"> Acne
+                </label>
+                <label class="block">
+                    <input type="checkbox" class="feature" value="sensitive"> Sensitive
+                </label>
+                <label class="block">
+                    <input type="checkbox" class="feature" value="fine lines"> Fine Lines
+                </label>
+                <label class="block">
+                    <input type="checkbox" class="feature" value="wrinkles"> Wrinkles
+                </label>
+                <label class="block">
+                    <input type="checkbox" class="feature" value="redness"> Redness
+                </label>
+                <label class="block">
+                    <input type="checkbox" class="feature" value="dull"> Dull
+                </label>
+                <label class="block">
+                    <input type="checkbox" class="feature" value="pore"> Pore
+                </label>
+                <label class="block">
+                    <input type="checkbox" class="feature" value="pigmentation"> Pigmentation
+                </label>
+                <label class="block">
+                    <input type="checkbox" class="feature" value="blackheads"> Blackheads
+                </label>
+                <label class="block">
+                    <input type="checkbox" class="feature" value="whiteheads"> Whiteheads
+                </label>
+                <label class="block">
+                    <input type="checkbox" class="feature" value="blemishes"> Blemishes
+                </label>
+                <label class="block">
+                    <input type="checkbox" class="feature" value="dark circles"> Dark Circles
+                </label>
+                <label class="block">
+                    <input type="checkbox" class="feature" value="eye bags"> Eye Bags
+                </label>
+                <label class="block">
+                    <input type="checkbox" class="feature" value="dark spots"> Dark Spots
+                </label>
+            </div>
+        </div>
+
+        <!-- Skin Tone Selection -->
+        <div class="mt-4">
+            <h3 class="text-lg">Skin Tone</h3>
+            <select id="skin-tone" class="border p-2 mt-2">
+                <option value="light to medium">Light to Medium</option>
+                <option value="medium to dark">Medium to Dark</option>
+                <option value="fair to light">Fair to Light</option>
+                <option value="dark to deep">Dark to Deep</option>
+            </select>
+        </div>
+
+        <!-- Skin Type Selection -->
+        <div class="mt-4">
+            <h3 class="text-lg">Skin Type</h3>
+            <select id="skin-type" class="border p-2 mt-2">
+                <option value="all">All</option>
+                <option value="normal">Normal</option>
+                <option value="oily">Oily</option>
+                <option value="combination">Combination</option>
+                <option value="dry">Dry</option>
+            </select>
+        </div>
+
+        <!-- Toggle Button -->
+        <div class="mt-4 mb-8">
+            <h2 class="text-xl font-semibold mb-4">Toggle for Makeup or Essentials</h2>
+            <label for="toggle" class="flex items-center">
+                <span class="mr-4">Makeup / Essentials</span>
+                <input type="checkbox" id="toggle" class="toggle" />
+            </label>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="mb-8">
+            <button onclick="updateRecommendations()" class="bg-blue-500 text-white p-2 rounded-lg">Get Recommendations</button>
+        </div>
+
+        <!-- Product Cards -->
+        <div id="product-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+    </div>
+
+    <script>
+        document.getElementById('toggle').addEventListener('change', updateRecommendations);
+
+        async function updateRecommendations() {
+            const isMakeup = document.getElementById('toggle').checked;
+            const features = Array.from(document.querySelectorAll('.feature:checked')).map(input => input.value);
+            const skinTone = document.getElementById('skin-tone').value;
+            const skinType = document.getElementById('skin-type').value;
+
+            const vector = getVector(features);
+            const url = isMakeup ? 'https://model-69nu.onrender.com/makeup' : 'https://model-69nu.onrender.com/essentials';
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    vector,
+                    skin_tone: skinTone,
+                    skin_type: skinType
+                })
+            });
+            const products = await response.json();
+            displayProducts(products);
+        }
+
+        function getVector(features) {
+            const allFeatures = ['normal', 'dry', 'oily', 'combination', 'acne', 'sensitive', 'fine lines', 'wrinkles', 'redness', 'dull', 'pore', 'pigmentation', 'blackheads', 'whiteheads', 'blemishes', 'dark circles', 'eye bags', 'dark spots'];
+            return allFeatures.map(feature => features.includes(feature) ? 1 : 0);
+        }
+
+        function displayProducts(products) {
+            const productCards = document.getElementById('product-cards');
+            productCards.innerHTML = '';
+
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 rounded-lg shadow-lg';
+
+                card.innerHTML = `
+                    <img src="${product.img}" alt="${product.name}" class="w-full h-32 object-cover mb-4 rounded">
+                    <h3 class="text-lg font-semibold">${product.name}</h3>
+                    <p class="text-sm text-gray-600">${product["skin type"]}</p>
+                    <p class="text-sm text-gray-600">Price: ${product.concern[0]}</p>
+                    <a href="${product.url}" target="_blank" class="text-blue-500 mt-2 inline-block">Buy Now</a>
+                `;
+
+                productCards.appendChild(card);
+            });
+        }
+
+        // Initialize with the default state
+        updateRecommendations();
+    </script>
+</body>
+</html>
