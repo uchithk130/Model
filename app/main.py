@@ -6,6 +6,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from mangum import Mangum
 app = FastAPI()
 
+
 # Load data
 df2 = pd.read_csv("data/final.csv")
 makeup = pd.read_csv("data/makeup_final.csv")
