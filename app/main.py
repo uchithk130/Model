@@ -8,8 +8,8 @@ app = FastAPI()
 
 
 # Load data
-df2 = pd.read_csv("data/final.csv")
-makeup = pd.read_csv("data/makeup_final.csv")
+df2 = pd.read_csv("app/final.csv")
+makeup = pd.read_csv("app/makeup_final.csv")
 features = ['normal', 'dry', 'oily', 'combination', 'acne', 'sensitive', 'fine lines', 'wrinkles', 
             'redness', 'dull', 'pore', 'pigmentation', 'blackheads', 'whiteheads', 'blemishes', 
             'dark circles', 'eye bags', 'dark spots']
