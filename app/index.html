@@ -72,7 +72,7 @@
         </div>
 
         <!-- Skin Tone Selection -->
-        <div class="mt-4">
+        <div id="skin-tone-section" class="mt-4 hidden">
             <h3 class="text-lg">Skin Tone</h3>
             <select id="skin-tone" class="border p-2 mt-2">
                 <option value="light to medium">Light to Medium</option>
@@ -83,7 +83,7 @@
         </div>
 
         <!-- Skin Type Selection -->
-        <div class="mt-4">
+        <div id="skin-type-section" class="mt-4 hidden">
             <h3 class="text-lg">Skin Type</h3>
             <select id="skin-type" class="border p-2 mt-2">
                 <option value="all">All</option>
@@ -113,6 +113,7 @@
     </div>
 
     <script>
+        // Add event listener for toggle button and initialize recommendation update
         document.getElementById('toggle').addEventListener('change', updateRecommendations);
 
         async function updateRecommendations() {
@@ -121,20 +122,39 @@
             const skinTone = document.getElementById('skin-tone').value;
             const skinType = document.getElementById('skin-type').value;
 
+            // Ensure features are selected
+            if (features.length === 0) {
+                alert("Please select at least one feature.");
+                return;
+            }
+
             const vector = getVector(features);
-            const url = isMakeup ? 'https://model-69nu.onrender.com/makeup' : 'https://model-69nu.onrender.com/essentials';
+
+            let url;
+            let body;
+
+            if (isMakeup) {
+                // For makeup, pass the vector, skin tone, and skin type
+                url = 'https://model-69nu.onrender.com/makeup';
+                body = {
+                    vector,
+                    skin_tone: skinTone,
+                    skin_type: skinType
+                };
+            } else {
+                // For essentials, pass only the vector
+                url = 'https://model-69nu.onrender.com/essentials';
+                body = { vector };
+            }
 
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    vector,
-                    skin_tone: skinTone,
-                    skin_type: skinType
-                })
+                body: JSON.stringify(body)
             });
+
             const products = await response.json();
             displayProducts(products);
         }
@@ -145,26 +165,42 @@
         }
 
         function displayProducts(products) {
-            const productCards = document.getElementById('product-cards');
-            productCards.innerHTML = '';
+    const productCards = document.getElementById('product-cards');
+    productCards.innerHTML = '';
 
-            products.forEach(product => {
-                const card = document.createElement('div');
-                card.className = 'bg-white p-4 rounded-lg shadow-lg';
+    products.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'bg-white p-4 rounded-lg shadow-lg';
 
-                card.innerHTML = `
-                    <img src="${product.img}" alt="${product.name}" class="w-full h-32 object-cover mb-4 rounded">
-                    <h3 class="text-lg font-semibold">${product.name}</h3>
-                    <p class="text-sm text-gray-600">${product["skin type"]}</p>
-                    <p class="text-sm text-gray-600">Price: ${product.concern[0]}</p>
-                    <a href="${product.url}" target="_blank" class="text-blue-500 mt-2 inline-block">Buy Now</a>
-                `;
+        const price = product.concern && product.concern.length > 0 ? product.concern[0] : 'Price not available';
 
-                productCards.appendChild(card);
-            });
-        }
+        card.innerHTML = `
+            <img src="${product.img}" alt="${product.name}" class="w-full h-32 object-cover mb-4 rounded">
+            <h3 class="text-lg font-semibold">${product.name}</h3>
+            <p class="text-sm text-gray-600">${product["skin type"]}</p>
+            <p class="text-sm text-gray-600">Price: ${price}</p>
+            <a href="${product.url}" target="_blank" class="text-blue-500 mt-2 inline-block">Buy Now</a>
+        `;
 
-        // Initialize with the default state
+        productCards.appendChild(card);
+    });
+}
+
+
+        // Toggle visibility of skin tone and skin type sections
+        document.getElementById('toggle').addEventListener('change', function () {
+            const skinToneSection = document.getElementById('skin-tone-section');
+            const skinTypeSection = document.getElementById('skin-type-section');
+            if (this.checked) {
+                skinToneSection.classList.remove('hidden');
+                skinTypeSection.classList.remove('hidden');
+            } else {
+                skinToneSection.classList.add('hidden');
+                skinTypeSection.classList.add('hidden');
+            }
+        });
+
+        // Initialize with the default state (skin tone and skin type sections hidden initially)
         updateRecommendations();
     </script>
 </body>
