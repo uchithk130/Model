@@ -47,13 +47,13 @@ class RecommendationRequest(BaseModel):
 # Helper function
 def wrap(info_arr):
     return {
-        "brand": info_arr[0],
-        "name": info_arr[1],
-        "price": info_arr[2],
+        "brand": info_arr[4],
+        "name": info_arr[5],
+        "price": info_arr[6],
         "url": info_arr[3],
-        "img": info_arr[4],
-        "skin type": info_arr[5],
-        "concern": str(info_arr[6]).split(','),
+        "img": info_arr[9],
+        "skin type": info_arr[7],
+        "concern": str(info_arr[8]).split(','),
     }
 
 # API endpoints
